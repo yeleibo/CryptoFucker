@@ -3,6 +3,7 @@ package com.example.a14473.xp;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.text.format.DateUtils;
 import android.util.Log;
 
 import java.io.File;
@@ -13,6 +14,7 @@ import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.nio.ByteBuffer;
 import java.security.Key;
@@ -145,7 +147,7 @@ public class TestHook implements IXposedHookLoadPackage {
                         protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                             byte[] data = (byte[]) param.args[0];
                             String str = "RSA X509EncodedKeySpecs:";
-                            Util.MyLog(loadPackageParam.packageName, str, data, 1024 * 10);
+                            Util.MyLog(loadPackageParam.packageName, str, data, 1024 * 100);
                         }
                     });
             // Primary Key
@@ -154,7 +156,7 @@ public class TestHook implements IXposedHookLoadPackage {
                         protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                             byte[] data = (byte[]) param.args[0];
                             String str = "RSA PKCS8EncodedKeySpec:";
-                            Util.MyLog(loadPackageParam.packageName, str, data, 1024 * 10);
+                            Util.MyLog(loadPackageParam.packageName, str, data, 1024 * 100);
                         }
                     });
 
@@ -301,23 +303,26 @@ class Util {
     }
 
     public static void MyLog(String pkg, String info, byte[] data) {
-        MyLog(pkg, info, data, 256);
+        MyLog(pkg, info, data, 2560000);
     }
 
     public static void WriteFile(String pkg, String content) {
-        String path = "/sdcard/ydsec/";
-        File pather = new File(path);
-        if (!pather.exists())
-            pather.mkdir();
-
-        String filename = path + pkg + ".txt";
-        try {
-            FileWriter fw = new FileWriter(filename, true);
-            fw.write(content);
-            fw.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(content.contains("<?xml.version=")){
+            String path = "/sdcard/ydsec/";
+            File pather = new File(path);
+            if (!pather.exists())
+                pather.mkdir();
+             Date now= new Date();
+            String filename = path + pkg + now.toString() + ".txt";
+            try {
+                FileWriter fw = new FileWriter(filename, true);
+                fw.write(content);
+                fw.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+
 
     }
 }
